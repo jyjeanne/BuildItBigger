@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "com.udacity.gradle.builditbigger"
+        minSdkVersion 10
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+        free {
+            applicationId "com.udacity.gradle.builditbigger.free"
+        }
+        paid {
+            applicationId "com.udacity.gradle.builditbigger.paid"
+        }
+    }
+}
+
+dependencies {
+    // libraries
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    // Added for test
+    testCompile 'junit:junit:4.12'
+    // Added for AdMob
+    freeCompile 'com.google.android.gms:play-services-ads:8.4.0'
+    freeCompile project(":jokeslibrary")
+
+    compile project(':jokesdisplay')
+    paidCompile project(path: ':backend', configuration: 'android-endpoints')
+    
+}
+
+task testAppEngineGCE(dependsOn: ':backend:appengineRun') {
+    description "Run tests with App Engine Google Cloud Endpoints."
+    group "verification"
+    project(':backend').afterEvaluate { backend ->
+        backend.extensions.appengine.daemon = true
+    }
+    doFirst {
+        println 'Running tests'
+        tasks.test.execute()
+    }
+}
+tasks.testAppEngineGCE.finalizedBy ':backend:appengineStop'
