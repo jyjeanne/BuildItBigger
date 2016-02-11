@@ -41,7 +41,7 @@ dependencies {
 
     compile project(':jokesdisplay')
     paidCompile project(path: ':backend', configuration: 'android-endpoints')
-    
+
 }
 
 task testAppEngineGCE(dependsOn: ':backend:appengineRun') {
